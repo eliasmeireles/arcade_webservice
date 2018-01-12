@@ -2,12 +2,19 @@
 require '../vendor/autoload.php';
 require '../src/config/Database.php';
 require '../src/config/PlayerDAO.php';
+require '../src/config/ApplicationValidation.php';
 require '../src/model/Player.php';
+require '../src/model/AppPermition.php';
 
+
+$config = ['settings' => [
+    'addContentLengthHeader' => false,
+]];
+$app = new \Slim\App($config);
 
 // This Slim setting is required for the middleware to work
 $app = new Slim\App([
-    "settings"  => [
+    "settings" => [
         "determineRouteBeforeAppMiddleware" => true,
     ]
 ]);
@@ -39,5 +46,12 @@ $app->add(function($request, $response, $next) {
     return $response->withHeader("Access-Control-Allow-Methods", implode(",", $methods));
 });
 
-require '../src/routes/players.php';
+
+// Define app routes
+$app->get('/hello/{name}', function ($request, $response, $args) {
+    return $response->write("Hello " . $args['name']);
+});
+
+require '../src/routes/route.php';
+
 $app->run();

@@ -31,7 +31,7 @@ class PlayerDAO
             $database = new Database();
             $database = $database->getConnection();
 
-            $stmt = $database->query("SELECT * FROM player WHERE id = $id");
+            $stmt = $database->query("SELECT * FROM player WHERE id = '{$id}'");
 
             $players = $stmt->fetchAll(PDO::FETCH_OBJ);
             $database = null;

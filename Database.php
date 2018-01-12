@@ -8,11 +8,11 @@
 
 class Database
 {
+    
     private $host = "localhost";
-    private $user = "root";
-    private $password = "root";
-    private $dataBaseName = "arcade_data_players";
-
+    private $user = "id2230004_arcadeadministration";
+    private $password = "rootAdmin";
+    private $dataBaseName = "id2230004_arcade_data_players";
 
 
     public function getConnection() {
