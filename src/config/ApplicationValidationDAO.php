@@ -19,11 +19,18 @@ class ApplicationValidationDAO
             $stmt->execute(['token' => $token]);
 
             if ($stmt->rowCount() > 0) {
-                $permiton = $stmt->fetchObject(AppPermition::class);
-                $permiton->setIsValid(true);
-                return $permiton[0];
+                $permition = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+
+
+                $appPermition = new AppPermition();
+                $appPermition->setPermitionToken($permition[0]->permition_token);
+                $appPermition->setIsValid(true);
+
+                return $appPermition;
             } else {
                 $permition = new AppPermition();
+                $permition->setPermitionToken($token);
                 $permition->setIsValid(false);
 
                 return $permition;

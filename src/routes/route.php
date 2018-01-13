@@ -18,8 +18,13 @@ $app->add(function ($req, $res, $next) {
         ->withHeader('Content-Type', 'application/json')
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 });
-$baseRequestURL = '/api/v1/';
 
+$app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
+    $name = $args['name'];
+    $response->getBody()->write("Hello, $name");
+
+    return $response;
+});
 
 $app->get('/api/v1/player/list/data', function (Request $request, Response $response, $arguments) {
 
@@ -145,20 +150,21 @@ $app->delete('/api/v1/player/delete/{id}', function (Request $request, Response 
 
 });
 
-$app->get('/api/v1/permition/data/{token}', function (Request $request, Response $response, array $arguments) {
+$app->get('/api/v1/permition/data/{validtoken}', function (Request $request, Response $response, array  $arguments) {
+
 
     try {
 
         $permition = new ApplicationValidationDAO();
 
-        $result = $permition->getPermition($arguments['token']);
+        $result = $permition->getPermition($arguments['validtoken']);
 
         if ($result && $result != null) {
             return $response
                 ->withStatus(200)
-                ->write($result);
+                ->write(json_encode($result));
         } else {
-            throw new PDOException('Internal server error');
+            throw new PDOException('Invalid application token');
         }
 
     } catch (PDOException $exception) {
@@ -168,37 +174,28 @@ $app->get('/api/v1/permition/data/{token}', function (Request $request, Response
 });
 
 
-$app->post('/api/v1/userroot/new/{token}', function (Request $request, Response $response, array $arguments) {
+$app->post('/api/v1/userroot/new', function (Request $request, Response $response, array $arguments) {
 
     try {
 
-        $token = json_encode($arguments['token']);
 
-        $permition = new ApplicationValidationDAO();
-        $result = $permition->getPermition($token);
+        $userRootParams = $request->getParsedBody();
 
-
-        if ($result && $result != null) {
-            $userRootParams = $request->getParsedBody();
-
-            $userRoot = new UserRoot();
-            $userRoot->setEmail($userRootParams['email']);
-            $userRoot->setSenha(password_hash($userRootParams['senha'], PASSWORD_DEFAULT));
+        $userRoot = new UserRoot();
+        $userRoot->setEmail($userRootParams['email']);
+        $userRoot->setSenha(password_hash($userRootParams['senha'], PASSWORD_DEFAULT));
 
 
-            $userRootDAO = new UserRootDAO();
+        $userRootDAO = new UserRootDAO();
 
-            $userRootResult = $userRootDAO->newRootUser($userRoot);
+        $userRootResult = $userRootDAO->newRootUser($userRoot);
 
-            if ($userRootResult && $userRootResult != null) {
-                return $response
-                    ->withStatus(201)
-                    ->write(json_encode($userRootResult));
-            } else {
-                throw new PDOException('Could not be created');
-            }
+        if ($userRootResult && $userRootResult != null) {
+            return $response
+                ->withStatus(201)
+                ->write(json_encode($userRootResult));
         } else {
-            throw new PDOException('Access dinied');
+            throw new PDOException('Could not be created');
         }
 
     } catch (PDOException $exception) {
@@ -207,38 +204,28 @@ $app->post('/api/v1/userroot/new/{token}', function (Request $request, Response 
 
 });
 
-$app->post('/api/v1/userroot/update/{token}', function (Request $request, Response $response, array $arguments) {
+$app->post('/api/v1/userroot/update', function (Request $request, Response $response, array $arguments) {
 
     try {
 
-        $token = json_encode($arguments['token']);
+        $userRootParams = $request->getParsedBody();
 
-        $permition = new ApplicationValidationDAO();
-        $result = $permition->getPermition($token);
-
-
-        if ($result && $result != null) {
-            $userRootParams = $request->getParsedBody();
-
-            $userRoot = new UserRoot();
-            $userRoot->setId($userRootParams['id']);
-            $userRoot->setEmail($userRootParams['email']);
-            $userRoot->setSenha(password_hash($userRootParams['senha'], PASSWORD_DEFAULT));
+        $userRoot = new UserRoot();
+        $userRoot->setId($userRootParams['id']);
+        $userRoot->setEmail($userRootParams['email']);
+        $userRoot->setSenha(password_hash($userRootParams['senha'], PASSWORD_DEFAULT));
 
 
-            $userRootDAO = new UserRootDAO();
+        $userRootDAO = new UserRootDAO();
 
-            $userRootResult = $userRootDAO->updateUserRoot($userRoot);
+        $userRootResult = $userRootDAO->updateUserRoot($userRoot);
 
-            if ($userRootResult && $userRootResult != null) {
-                return $response
-                    ->withStatus(201)
-                    ->write(json_encode($userRootResult));
-            } else {
-                throw new PDOException('Could not be created');
-            }
+        if ($userRootResult && $userRootResult != null) {
+            return $response
+                ->withStatus(201)
+                ->write(json_encode($userRootResult));
         } else {
-            throw new PDOException('Access dinied');
+            throw new PDOException('Could not be created');
         }
 
     } catch (PDOException $exception) {
