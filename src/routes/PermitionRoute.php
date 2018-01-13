@@ -21,7 +21,7 @@ $app->add(function ($req, $res, $next) {
 
 $app->get('/api/permition/data/{token}', function (Request $request, Response $response, array $arguments) {
 
-    $permition = new ApplicationValidation();
+    $permition = new ApplicationValidationDAO();
 
     $result = $permition->getPermition($arguments['token']);
 

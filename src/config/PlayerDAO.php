@@ -31,12 +31,14 @@ class PlayerDAO
             $database = new Database();
             $database = $database->getConnection();
 
-            $stmt = $database->query("SELECT * FROM player WHERE id = '{$id}'");
+            $stmt = $database->prepare("SELECT * FROM player WHERE id = :id");
+
+            $stmt->execute(["id" => $id]);
 
             $players = $stmt->fetchAll(PDO::FETCH_OBJ);
             $database = null;
 
-            return json_encode($players);
+            return json_encode($players[0]);
         } catch (PDOException $exception) {
             $this->echoError($exception);
         }
@@ -46,12 +48,25 @@ class PlayerDAO
     {
 
         try {
-            $insertPlayerData = "INSERT INTO player(nome, pontos) VALUE ('{$player->getNome()}', {$player->getPontos()})";
+            $insertPlayerData = "INSERT INTO player(nome, pontos, data) VALUE (:nome, :pontos, :data)";
             $database = new Database();
             $database = $database->getConnection();
 
-            $database->query($insertPlayerData);
-            return true;
+            $stmt = $database->prepare($insertPlayerData);
+
+
+            $stmt->execute(
+                [
+                    "nome" => $player->getNome(),
+                    "pontos" => $player->getPontos(),
+                    "data" => $player->getData()
+                ]
+            );
+
+            $lastId = $database->lastInsertId();
+
+            return $this->getPlayer($lastId);
+
         } catch (PDOException $exception) {
             $this->echoError($exception);
         }
@@ -62,13 +77,22 @@ class PlayerDAO
     {
 
         try {
-            $insertPlayerData = "UPDATE player SET nome = '{$player->getNome()}', pontos = {$player->getPontos()} WHERE id = {$player->getId()}";
+            $query = "UPDATE player SET nome = :nome, pontos = :pontos WHERE id = :id";
             $database = new Database();
             $database = $database->getConnection();
 
-            $database->query($insertPlayerData);
+            $stmt = $database->prepare($query);
 
-            return true;
+            $stmt->execute(
+                [
+                    "id" => $player->getId(),
+                    "nome" => $player->getNome(),
+                    "pontos" => $player->getPontos(),
+                    "data" => $player->getData()
+                ]
+            );
+
+            return $this->getPlayer($player->getId());
         } catch (PDOException $exception) {
             $this->echoError($exception);
         }
@@ -79,13 +103,13 @@ class PlayerDAO
     {
 
         try {
-            $insertPlayerData = "DELETE FROM player WHERE id = {$player->getId()}";
+            $query = "DELETE FROM player WHERE id = :id";
             $database = new Database();
             $database = $database->getConnection();
 
-            $database->query($insertPlayerData);
+            $stmt = $database->prepare($query);
 
-            return true;
+            return $stmt->execute(["id" => $player->getId()]);
         } catch (PDOException $exception) {
             $this->echoError($exception);
         }

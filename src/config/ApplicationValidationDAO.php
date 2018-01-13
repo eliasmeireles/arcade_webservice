@@ -6,7 +6,7 @@
  * Time: 22:26
  */
 
-class ApplicationValidation
+class ApplicationValidationDAO
 {
 
     public function getPermition($token)
@@ -15,13 +15,13 @@ class ApplicationValidation
             $database = new Database();
             $database = $database->getConnection();
 
-            $stmt = $database->prepare("SELECT id, permition_token FROM application_permition WHERE permition_token = '{$token}'");
-            $stmt->execute([$token]);
+            $stmt = $database->prepare("SELECT id, permition_token FROM application_permition WHERE permition_token = :token");
+            $stmt->execute(['token' => $token]);
 
             if ($stmt->rowCount() > 0) {
                 $permiton = $stmt->fetchObject(AppPermition::class);
                 $permiton->setIsValid(true);
-                return $permiton;
+                return $permiton[0];
             } else {
                 $permition = new AppPermition();
                 $permition->setIsValid(false);

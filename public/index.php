@@ -2,9 +2,11 @@
 require '../vendor/autoload.php';
 require '../src/config/Database.php';
 require '../src/config/PlayerDAO.php';
-require '../src/config/ApplicationValidation.php';
+require '../src/config/UserRootDAO.php';
+require '../src/config/ApplicationValidationDAO.php';
 require '../src/model/Player.php';
 require '../src/model/AppPermition.php';
+require '../src/model/UserRoot.php';
 
 
 $config = ['settings' => [
@@ -46,11 +48,6 @@ $app->add(function($request, $response, $next) {
     return $response->withHeader("Access-Control-Allow-Methods", implode(",", $methods));
 });
 
-
-// Define app routes
-$app->get('/hello/{name}', function ($request, $response, $args) {
-    return $response->write("Hello " . $args['name']);
-});
 
 require '../src/routes/route.php';
 

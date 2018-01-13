@@ -6,11 +6,12 @@
  * Time: 17:37
  */
 
-class Player
+class Player implements JsonSerializable
 {
     private $id;
     private $nome;
     private $pontos;
+    private $data;
 
     /**
      * @return mixed
@@ -58,5 +59,32 @@ class Player
     public function setPontos($pontos)
     {
         $this->pontos = $pontos;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param mixed $data
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+    }
+
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'pontos' => $this->getPontos(),
+            'data' => $this->getData()
+        ];
     }
 }

@@ -18,8 +18,10 @@ $app->add(function ($req, $res, $next) {
         ->withHeader('Content-Type', 'application/json')
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 });
+$baseRequestURL = '/api/v1/';
 
-$app->get('/api/player/list/data', function (Request $request, Response $response, $arguments) {
+
+$app->get('/api/v1/player/list/data', function (Request $request, Response $response, $arguments) {
 
     try {
 
@@ -39,7 +41,7 @@ $app->get('/api/player/list/data', function (Request $request, Response $respons
     }
 });
 
-$app->get('/api/player/data/{id}', function (Request $request, Response $response, $arguments) {
+$app->get('/api/v1/player/data/{id}', function (Request $request, Response $response, $arguments) {
 
 
     try {
@@ -61,23 +63,26 @@ $app->get('/api/player/data/{id}', function (Request $request, Response $respons
     }
 });
 
-$app->post('/api/player/savenew', function (Request $request, Response $response, $arguments) {
+$app->post('/api/v1/player/new', function (Request $request, Response $response, $arguments) {
 
     try {
+        date_default_timezone_set("America/Brasilia");
 
         $playerParans = $request->getParsedBody();
 
         $player = new Player();
         $player->setNome($playerParans['nome']);
         $player->setPontos($playerParans['pontos']);
+        $player->setData(date('Y-m-d'));
 
 
         $playerSQL = new PlayerDAO();
 
-        if ($playerSQL->newPlayer($player)) {
+        $result = $playerSQL->newPlayer($player);
+        if ($result && $result != null) {
             return $response
                 ->withStatus(201)
-                ->write(true);
+                ->write($result);
         } else {
             throw new PDOException('Could not be created');
         }
@@ -88,7 +93,7 @@ $app->post('/api/player/savenew', function (Request $request, Response $response
 
 });
 
-$app->put('/api/player/update', function (Request $request, Response $response) {
+$app->put('/api/v1/player/update', function (Request $request, Response $response) {
 
 
     try {
@@ -103,10 +108,11 @@ $app->put('/api/player/update', function (Request $request, Response $response) 
 
         $playerSQL = new PlayerDAO();
 
-        if ($playerSQL->updatePlayer($player)) {
+        $updatePlayer = $playerSQL->updatePlayer($player);
+        if ($updatePlayer && $updatePlayer != null) {
             return $response
                 ->withStatus(201)
-                ->write(true);
+                ->write($updatePlayer);
         } else {
             throw new PDOException('Could not be created');
         }
@@ -117,7 +123,7 @@ $app->put('/api/player/update', function (Request $request, Response $response) 
 });
 
 
-$app->patch('/api/player/delete/{id}', function (Request $request, Response $response, array $arguments) {
+$app->delete('/api/v1/player/delete/{id}', function (Request $request, Response $response, array $arguments) {
 
     try {
 
@@ -128,8 +134,7 @@ $app->patch('/api/player/delete/{id}', function (Request $request, Response $res
 
         if ($playerSQL->delete($player)) {
             return $response
-                ->withStatus(200)
-                ->write(true);
+                ->withStatus(200);
         } else {
             throw new PDOException('Internal server error');
         }
@@ -140,11 +145,11 @@ $app->patch('/api/player/delete/{id}', function (Request $request, Response $res
 
 });
 
-$app->get('/api/permition/data/{token}', function (Request $request, Response $response, array $arguments) {
+$app->get('/api/v1/permition/data/{token}', function (Request $request, Response $response, array $arguments) {
 
     try {
 
-        $permition = new ApplicationValidation();
+        $permition = new ApplicationValidationDAO();
 
         $result = $permition->getPermition($arguments['token']);
 
@@ -154,6 +159,155 @@ $app->get('/api/permition/data/{token}', function (Request $request, Response $r
                 ->write($result);
         } else {
             throw new PDOException('Internal server error');
+        }
+
+    } catch (PDOException $exception) {
+        return writeError($response, $exception, 400);
+    }
+
+});
+
+
+$app->post('/api/v1/userroot/new/{token}', function (Request $request, Response $response, array $arguments) {
+
+    try {
+
+        $token = json_encode($arguments['token']);
+
+        $permition = new ApplicationValidationDAO();
+        $result = $permition->getPermition($token);
+
+
+        if ($result && $result != null) {
+            $userRootParams = $request->getParsedBody();
+
+            $userRoot = new UserRoot();
+            $userRoot->setEmail($userRootParams['email']);
+            $userRoot->setSenha(password_hash($userRootParams['senha'], PASSWORD_DEFAULT));
+
+
+            $userRootDAO = new UserRootDAO();
+
+            $userRootResult = $userRootDAO->newRootUser($userRoot);
+
+            if ($userRootResult && $userRootResult != null) {
+                return $response
+                    ->withStatus(201)
+                    ->write(json_encode($userRootResult));
+            } else {
+                throw new PDOException('Could not be created');
+            }
+        } else {
+            throw new PDOException('Access dinied');
+        }
+
+    } catch (PDOException $exception) {
+        return writeError($response, $exception, 400);
+    }
+
+});
+
+$app->post('/api/v1/userroot/update/{token}', function (Request $request, Response $response, array $arguments) {
+
+    try {
+
+        $token = json_encode($arguments['token']);
+
+        $permition = new ApplicationValidationDAO();
+        $result = $permition->getPermition($token);
+
+
+        if ($result && $result != null) {
+            $userRootParams = $request->getParsedBody();
+
+            $userRoot = new UserRoot();
+            $userRoot->setId($userRootParams['id']);
+            $userRoot->setEmail($userRootParams['email']);
+            $userRoot->setSenha(password_hash($userRootParams['senha'], PASSWORD_DEFAULT));
+
+
+            $userRootDAO = new UserRootDAO();
+
+            $userRootResult = $userRootDAO->updateUserRoot($userRoot);
+
+            if ($userRootResult && $userRootResult != null) {
+                return $response
+                    ->withStatus(201)
+                    ->write(json_encode($userRootResult));
+            } else {
+                throw new PDOException('Could not be created');
+            }
+        } else {
+            throw new PDOException('Access dinied');
+        }
+
+    } catch (PDOException $exception) {
+        return writeError($response, $exception, 400);
+    }
+
+});
+
+$app->post('/api/v1/userroot/get', function (Request $request, Response $response, array $arguments) {
+
+    try {
+
+        $userRootParams = $request->getParsedBody();
+
+        $userRoot = new UserRoot();
+        $userRoot->setEmail($userRootParams['email']);
+        $userRoot->setSenha($userRootParams['senha']);
+
+        $userRootDAO = new UserRootDAO();
+
+        $userRootResult = $userRootDAO->getUserRoot($userRoot);
+
+
+        if ($userRootResult && $userRootResult != null) {
+            $decode = json_encode($userRootResult);
+
+
+            $decode = json_decode($decode);
+
+            if (password_verify($userRoot->getSenha(), $decode->senha)) {
+                return $response
+                    ->withStatus(200)
+                    ->write(json_encode($userRootResult));
+            } else {
+                throw new PDOException('No user found');
+            }
+        } else {
+            throw new PDOException('No user found');
+        }
+
+    } catch (PDOException $exception) {
+        return writeError($response, $exception, 400);
+    }
+
+});
+
+$app->delete('/api/v1/userroot/delete/{id}/{token}', function (Request $request, Response $response, array $arguments) {
+
+    try {
+        $token = json_encode($arguments['token']);
+        $id = json_encode($arguments['id']);
+
+        $permition = new ApplicationValidationDAO();
+        $result = $permition->getPermition($token);
+
+
+        if ($result && $result != null) {
+            $userRoot = new UserRoot();
+            $userRoot->setId($id);
+
+
+            $userRootDAO = new UserRootDAO();
+
+            $userRootDAO->deleteUserRoot($userRoot);
+
+            return $response
+                ->withStatus(200);
+        } else {
+            throw new PDOException('Access dinied');
         }
 
     } catch (PDOException $exception) {
