@@ -23,13 +23,15 @@ CREATE TABLE player_old (
   data   DATE                              NOT NULL
 );
 
-DROP TABLE IF EXISTS system_root;
+DROP TABLE IF EXISTS user_root;
 
 CREATE TABLE user_root (
   id    BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
   email VARCHAR(200)                      NOT NULL UNIQUE,
   senha CHAR(60)                          NOT NULL
 );
+
+DROP TABLE IF EXISTS application_permition;
 
 CREATE TABLE application_permition(
   id CHAR(36) UNIQUE     NOT NULL,

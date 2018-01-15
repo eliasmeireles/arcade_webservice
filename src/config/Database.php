@@ -8,10 +8,10 @@
 
 class Database
 {
-    private $host = "localhost";
-    private $user = "root";
-    private $password = "root";
-    private $dataBaseName = "arcade_data_players";
+    private $host = "mysql.hostinger.com.br";
+    private $user = "u869896919_mysql";
+    private $password = "adminRoot";
+    private $dataBaseName = "u869896919_geren";
 
 
 

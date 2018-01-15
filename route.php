@@ -177,6 +177,8 @@ $app->get('/api/v1/permition/data/{validtoken}', function (Request $request, Res
 $app->post('/api/v1/userroot/new', function (Request $request, Response $response, array $arguments) {
 
     try {
+
+
         $userRootParams = $request->getParsedBody();
 
         $userRoot = new UserRoot();
@@ -235,6 +237,11 @@ $app->post('/api/v1/userroot/update', function (Request $request, Response $resp
 $app->post('/api/v1/userroot/get', function (Request $request, Response $response, array $arguments) {
 
     try {
+
+        return $response
+            ->withStatus(200)
+            ->write(json_encode($request->getParsedBody()));
+
 
         $userRootParams = $request->getParsedBody();
 
