@@ -12,8 +12,9 @@ class UserRootDAO
     {
 
         try {
-            $query = "INSERT INTO user_root(email, senha) VALUE (:email, :senha)";
+            $query = "INSERT INTO user_root(nome, email, senha) VALUE (:nome, :email, :senha)";
             $database = new Database();
+
             $database = $database->getConnection();
 
             $stmt = $database->prepare($query);
@@ -21,6 +22,7 @@ class UserRootDAO
 
             $stmt->execute(
                 [
+                    "nome" => $userRoot->getNome(),
                     "email" => $userRoot->getEmail(),
                     "senha" => $userRoot->getSenha()
                 ]
@@ -31,7 +33,7 @@ class UserRootDAO
             return $this->getRootUserById($lastId);
 
         } catch (PDOException $exception) {
-            return $this->echoError($exception);
+            return $exception->getMessage();
         }
     }
 
@@ -108,9 +110,10 @@ class UserRootDAO
     }
 
 
-    public function deleteUserRoot(UserRoot $userRoot) {
+    public function deleteUserRoot(UserRoot $userRoot)
+    {
 
-        try{
+        try {
             $query = "DELETE FROM user_root WHERE id = :id";
 
             $database = new Database();

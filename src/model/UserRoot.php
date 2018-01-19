@@ -9,6 +9,7 @@
 class UserRoot implements JsonSerializable
 {
     private $id;
+    private $nome;
     private $email;
     private $senha;
 
@@ -27,6 +28,23 @@ class UserRoot implements JsonSerializable
     {
         $this->id = $id;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getNome()
+    {
+        return $this->nome;
+    }
+
+    /**
+     * @param mixed $nome
+     */
+    public function setNome($nome)
+    {
+        $this->nome = $nome;
+    }
+
 
     /**
      * @return mixed
@@ -71,9 +89,10 @@ class UserRoot implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-          "id" => $this->getId(),
-          "email" => $this->getEmail(),
-          "senha" => $this->getSenha()
+            "id" => $this->getId(),
+            "nome" => $this->getNome(),
+            "email" => $this->getEmail(),
+            "senha" => $this->getSenha()
         ];
     }
 }

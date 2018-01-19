@@ -26,7 +26,7 @@ $app->get('/hello/{name}', function (Request $request, Response $response, array
     return $response;
 });
 
-$app->get('/api/v1/player/list/data', function (Request $request, Response $response, $arguments) {
+$app->get('/v1/player/list', function (Request $request, Response $response, $arguments) {
 
     try {
 
@@ -46,7 +46,7 @@ $app->get('/api/v1/player/list/data', function (Request $request, Response $resp
     }
 });
 
-$app->get('/api/v1/player/data/{id}', function (Request $request, Response $response, $arguments) {
+$app->get('/v1/player/data/{id}', function (Request $request, Response $response, $arguments) {
 
 
     try {
@@ -68,17 +68,17 @@ $app->get('/api/v1/player/data/{id}', function (Request $request, Response $resp
     }
 });
 
-$app->post('/api/v1/player/new', function (Request $request, Response $response, $arguments) {
+$app->post('/v1/player/new', function (Request $request, Response $response, $arguments) {
+    date_default_timezone_set("America/Brasilia");
+
+    $playerParans = $request->getParsedBody();
+
+    $player = new Player();
+    $player->setNome($playerParans['nome']);
+    $player->setPontos($playerParans['pontos']);
+    $player->setData(date('Y-m-d'));
 
     try {
-        date_default_timezone_set("America/Brasilia");
-
-        $playerParans = $request->getParsedBody();
-
-        $player = new Player();
-        $player->setNome($playerParans['nome']);
-        $player->setPontos($playerParans['pontos']);
-        $player->setData(date('Y-m-d'));
 
 
         $playerSQL = new PlayerDAO();
@@ -87,7 +87,7 @@ $app->post('/api/v1/player/new', function (Request $request, Response $response,
         if ($result && $result != null) {
             return $response
                 ->withStatus(201)
-                ->write($result);
+                ->write(json_encode($result));
         } else {
             throw new PDOException('Could not be created');
         }
@@ -98,7 +98,7 @@ $app->post('/api/v1/player/new', function (Request $request, Response $response,
 
 });
 
-$app->put('/api/v1/player/update', function (Request $request, Response $response) {
+$app->put('/v1/player/update', function (Request $request, Response $response) {
 
 
     try {
@@ -128,7 +128,7 @@ $app->put('/api/v1/player/update', function (Request $request, Response $respons
 });
 
 
-$app->delete('/api/v1/player/delete/{id}', function (Request $request, Response $response, array $arguments) {
+$app->delete('/v1/player/delete/{id}', function (Request $request, Response $response, array $arguments) {
 
     try {
 
@@ -150,7 +150,7 @@ $app->delete('/api/v1/player/delete/{id}', function (Request $request, Response 
 
 });
 
-$app->get('/api/v1/permition/data/{validtoken}', function (Request $request, Response $response, array  $arguments) {
+$app->get('/v1/permition/data/{validtoken}', function (Request $request, Response $response, array $arguments) {
 
 
     try {
@@ -174,15 +174,15 @@ $app->get('/api/v1/permition/data/{validtoken}', function (Request $request, Res
 });
 
 
-$app->post('/api/v1/userroot/new', function (Request $request, Response $response, array $arguments) {
+$app->post('/v1/userroot/new', function (Request $request, Response $response, array $arguments) {
 
     try {
         $userRootParams = $request->getParsedBody();
 
         $userRoot = new UserRoot();
+        $userRoot->setNome($userRootParams['nome']);
         $userRoot->setEmail($userRootParams['email']);
         $userRoot->setSenha(password_hash($userRootParams['senha'], PASSWORD_DEFAULT));
-
 
         $userRootDAO = new UserRootDAO();
 
@@ -202,7 +202,7 @@ $app->post('/api/v1/userroot/new', function (Request $request, Response $respons
 
 });
 
-$app->post('/api/v1/userroot/update', function (Request $request, Response $response, array $arguments) {
+$app->post('/v1/userroot/update', function (Request $request, Response $response, array $arguments) {
 
     try {
 
@@ -212,7 +212,6 @@ $app->post('/api/v1/userroot/update', function (Request $request, Response $resp
         $userRoot->setId($userRootParams['id']);
         $userRoot->setEmail($userRootParams['email']);
         $userRoot->setSenha(password_hash($userRootParams['senha'], PASSWORD_DEFAULT));
-
 
         $userRootDAO = new UserRootDAO();
 
@@ -232,7 +231,7 @@ $app->post('/api/v1/userroot/update', function (Request $request, Response $resp
 
 });
 
-$app->post('/api/v1/userroot/get', function (Request $request, Response $response, array $arguments) {
+$app->post('/v1/userroot/get', function (Request $request, Response $response, array $arguments) {
 
     try {
 
@@ -270,7 +269,7 @@ $app->post('/api/v1/userroot/get', function (Request $request, Response $respons
 
 });
 
-$app->delete('/api/v1/userroot/delete/{id}/{token}', function (Request $request, Response $response, array $arguments) {
+$app->delete('/v1/userroot/delete/{id}/{token}', function (Request $request, Response $response, array $arguments) {
 
     try {
         $token = json_encode($arguments['token']);

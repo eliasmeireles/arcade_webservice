@@ -38,7 +38,7 @@ class PlayerDAO
             $players = $stmt->fetchAll(PDO::FETCH_OBJ);
             $database = null;
 
-            return json_encode($players[0]);
+            return $players[0];
         } catch (PDOException $exception) {
             $this->echoError($exception);
         }
@@ -68,9 +68,8 @@ class PlayerDAO
             return $this->getPlayer($lastId);
 
         } catch (PDOException $exception) {
-            $this->echoError($exception);
+           return $exception->getMessage();
         }
-        return false;
     }
 
     public function updatePlayer(Player $player)
