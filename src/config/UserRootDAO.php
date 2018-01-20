@@ -81,7 +81,7 @@ class UserRootDAO
 
             return $userRootResult[0];
         } catch (PDOException $exception) {
-            return $this->echoError($exception);
+            return $exception;
         }
     }
 

@@ -9,31 +9,26 @@
 class ApplicationValidationDAO
 {
 
-    public function getPermition($token)
+    public function getPermition(AppPermition $token)
     {
         try {
             $database = new Database();
             $database = $database->getConnection();
 
             $stmt = $database->prepare("SELECT id, permition_token FROM application_permition WHERE permition_token = :token");
-            $stmt->execute(['token' => $token]);
-
-            if ($stmt->rowCount() > 0) {
-                $permition = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-
+            $stmt->execute(['token' => $token->getPermitionToken()]);
 
                 $appPermition = new AppPermition();
-                $appPermition->setPermitionToken($permition[0]->permition_token);
+            if ($stmt->rowCount() > 0) {
+                $appPermition->setPermitionToken($token->getPermitionToken());
                 $appPermition->setIsValid(true);
 
                 return $appPermition;
             } else {
-                $permition = new AppPermition();
-                $permition->setPermitionToken($token);
-                $permition->setIsValid(false);
+                $appPermition->setPermitionToken($token->getPermitionToken());
+                $appPermition->setIsValid(false);
 
-                return $permition;
+                return $appPermition;
             }
 
         } catch (PDOException $exception) {

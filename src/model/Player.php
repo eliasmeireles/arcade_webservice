@@ -10,6 +10,7 @@ class Player implements JsonSerializable
 {
     private $id;
     private $nome;
+    private $email;
     private $pontos;
     private $data;
 
@@ -44,6 +45,23 @@ class Player implements JsonSerializable
     {
         $this->nome = $nome;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param mixed $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
 
     /**
      * @return mixed
@@ -83,6 +101,7 @@ class Player implements JsonSerializable
         return [
             'id' => $this->getId(),
             'nome' => $this->getNome(),
+            'email' => $this->getEmail(),
             'pontos' => $this->getPontos(),
             'data' => $this->getData()
         ];

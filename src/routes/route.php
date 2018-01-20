@@ -14,16 +14,9 @@ $app->add(function ($req, $res, $next) {
     $response = $next($req, $res);
     return $response
         ->withHeader('Access-Control-Allow-Origin', '*')
-        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, Accept, Origin, Authorization')
         ->withHeader('Content-Type', 'application/json')
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-});
-
-$app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
-    $name = $args['name'];
-    $response->getBody()->write("Hello, $name");
-
-    return $response;
 });
 
 $app->get('/v1/player/list', function (Request $request, Response $response, $arguments) {
@@ -69,14 +62,16 @@ $app->get('/v1/player/data/{id}', function (Request $request, Response $response
 });
 
 $app->post('/v1/player/new', function (Request $request, Response $response, $arguments) {
-    date_default_timezone_set("America/Brasilia");
+    date_default_timezone_set('America/Sao_Paulo');
 
     $playerParans = $request->getParsedBody();
 
     $player = new Player();
     $player->setNome($playerParans['nome']);
+    $player->setEmail($playerParans['email']);
     $player->setPontos($playerParans['pontos']);
     $player->setData(date('Y-m-d'));
+
 
     try {
 
@@ -117,7 +112,7 @@ $app->put('/v1/player/update', function (Request $request, Response $response) {
         if ($updatePlayer && $updatePlayer != null) {
             return $response
                 ->withStatus(201)
-                ->write($updatePlayer);
+                ->write(json_encode($updatePlayer));
         } else {
             throw new PDOException('Could not be created');
         }
@@ -150,14 +145,15 @@ $app->delete('/v1/player/delete/{id}', function (Request $request, Response $res
 
 });
 
-$app->get('/v1/permition/data/{validtoken}', function (Request $request, Response $response, array $arguments) {
+$app->get('/v1/permition/data/', function (Request $request, Response $response, array $arguments) {
 
-
+    $appPermition = new AppPermition();
+    $appPermition->setPermitionToken($request->getHeader('Authorization')[0]);
     try {
 
         $permition = new ApplicationValidationDAO();
 
-        $result = $permition->getPermition($arguments['validtoken']);
+        $result = $permition->getPermition($appPermition);
 
         if ($result && $result != null) {
             return $response
@@ -233,8 +229,9 @@ $app->post('/v1/userroot/update', function (Request $request, Response $response
 
 $app->post('/v1/userroot/get', function (Request $request, Response $response, array $arguments) {
 
-    try {
+    $autorization = $request->getHeader('Authorization');
 
+    try {
         $userRootParams = $request->getParsedBody();
 
         $userRoot = new UserRoot();

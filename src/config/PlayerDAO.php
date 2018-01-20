@@ -48,7 +48,7 @@ class PlayerDAO
     {
 
         try {
-            $insertPlayerData = "INSERT INTO player(nome, pontos, data) VALUE (:nome, :pontos, :data)";
+            $insertPlayerData = "INSERT INTO player(nome, email, pontos, data) VALUE (:nome, :email, :pontos, :data)";
             $database = new Database();
             $database = $database->getConnection();
 
@@ -58,6 +58,7 @@ class PlayerDAO
             $stmt->execute(
                 [
                     "nome" => $player->getNome(),
+                    "email" => $player->getEmail(),
                     "pontos" => $player->getPontos(),
                     "data" => $player->getData()
                 ]
@@ -76,7 +77,7 @@ class PlayerDAO
     {
 
         try {
-            $query = "UPDATE player SET nome = :nome, pontos = :pontos WHERE id = :id";
+            $query = "UPDATE player SET pontos = :pontos WHERE id = :id";
             $database = new Database();
             $database = $database->getConnection();
 
@@ -85,9 +86,7 @@ class PlayerDAO
             $stmt->execute(
                 [
                     "id" => $player->getId(),
-                    "nome" => $player->getNome(),
-                    "pontos" => $player->getPontos(),
-                    "data" => $player->getData()
+                    "pontos" => $player->getPontos()
                 ]
             );
 

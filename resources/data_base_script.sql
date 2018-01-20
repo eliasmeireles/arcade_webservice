@@ -10,6 +10,7 @@ CREATE TABLE player (
   id     BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
   nome   VARCHAR(155)                      NOT NULL,
   pontos BIGINT                            NOT NULL,
+  email  VARCHAR(300)                      NOT NULL UNIQUE,
   data   DATE                              NOT NULL
 );
 
@@ -19,6 +20,7 @@ DROP TABLE IF EXISTS player_old;
 CREATE TABLE player_old (
   id     BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
   nome   VARCHAR(155)                      NOT NULL,
+  email  VARCHAR(300)                      NOT NULL,
   pontos BIGINT                            NOT NULL,
   data   DATE                              NOT NULL
 );
@@ -42,3 +44,13 @@ CREATE TABLE application_permition (
 INSERT INTO application_permition
 VALUES ('bwfa80c9-9284-173d-94db-759a9030905c', 'ftfa80c9-9284-473d-94db-759a9030905c');
 
+
+# Triguer QUERY
+# CREATE DEFINER =`root`@`localhost` TRIGGER `arcade_data_players`.`player_BEFORE_DELETE`
+#   BEFORE DELETE
+#   ON `player`
+#   FOR EACH ROW
+#   BEGIN
+#     INSERT INTO player_old (nome, email, pontos, data)
+#       VALUE (OLD.nome, OLD.email, OLD.pontos, OLD.data);
+#   END
